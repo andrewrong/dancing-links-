@@ -12,72 +12,99 @@ struct head
     int num;
 };
 
-head key[256] = {NULL};
+head key[1024] = {NULL};
+head *array = NULL;
+/*
+ * 1. 只是值传递从而导致了指针没有变化
+ * 2. 没有对初始化字符串最后的\0
+ * 3. 没有判断i=0的情况*/
 
-void itoa(int i,char *ch)
+char *m_itoa(int i,char *ch,int num)
 {
-    int length = strlen(ch);
-    char *tmp = ch + length;
-
-    while(i)    
+    
+    char *tmp = ch + num - 1;
+    *tmp = '\0';
+    if( i == 0)
     {
-	int j = i % 10;
-	*(--tmp) = j + '0';
-	i = i / 10;
+	*(--tmp) = i + '0';
     }
+    else
+    {
+	while(i)    
+    	{
+    	    int j = i % 10;
+    	    *(--tmp) = j + '0';
+    	    i = i / 10;
+    	}
+    }
+
+    return tmp;
 }
 
-head matrixcvtlinks(int **matrix,int width,int height)
+/*
+ * 1.关于二维数组在参数传递的时候发生的变化已经忘记
+ * 2.链表和数组的地址问题犯错了,以为链表的下一个和数组的下一个是一样的
+ * 3.if判断的时候用=替代了==这个错误很初级*/
+
+head matrixcvtlinks(int (*matrix)[7],int row,int column)
 {
     int i = 0;
     int j = 0;
-    char str[256];
-    head h = (head)MALLOC(sizeof(struct head));
-    head array = NULL;
 
-    assert(matrix && width >= 0 && height >= 0);
+    char str[256];
+    char *strname = str;
+
+    head h = (head)MALLOC(sizeof(struct head));
+    array = (head*)MALLOC(sizeof(head) * column);
+
+    assert(matrix && row >= 0 && column >= 0);
     assert(h);
+    assert(array);
 
     h->right = h->left = h;
     h->down = h->up = h->c = NULL;
-    
-    for(i = 0; i < width; i++)
+   
+    for(i = 0; i < column; i++)
     {
-	head tmp = (head)MALLOC(sizeof(struct head));
-	assert(tmp);
+	head tmp1 = (head)MALLOC(sizeof(struct head));
+	assert(tmp1);
 
-	tmp->right = h->left->right;
-	h->left->right = tmp;
-	tmp->left = h->left;
-	h->left = tmp;
-	tmp->down = tmp->up = tmp;
-	itoa(i,str,10);
-	strcpy(tmp->name,str);
-	tmp->num = 0;
+	tmp1->right = h->left->right;
+	h->left->right = tmp1;
+	tmp1->left = h->left;
+	h->left = tmp1;
+	tmp1->down = tmp1->up = tmp1;
+	strname = m_itoa(i,strname,256);
+	strcpy(tmp1->name,strname);
+	tmp1->num = 0;
+	tmp1->c = tmp1;
+	array[i] = tmp1;
     }
-    
-    array = h->right;
 
-
-    for(j = 0; j < height; j++)
+    for(j = 0; j < row ; j++)
     {
 	head ptr = NULL;
-	for(i = 0; i < width; i++)
+	for(i = 0; i < column; i++)
 	{
-	    if(matrix[i][j])
+	    if(matrix[j][i])
 	    {
-		head tmp = (head)MALLOC(sizeof(head));
-
-		tmp->down = (*(array + i)).up->down;
-		(*(array + i)).up->down = tmp;
-		tmp->up = (*(array + i)).up;
-		(*(array + i)).up = tmp;
+		head tmp = (head)MALLOC(sizeof(struct head));
+		char name[10];
+		char *name1 = name;
+		assert(tmp);
 		
-		tmp->c = array + i;
+		name1 = m_itoa(j,name1,10);
+		tmp->c = array[i];
+		strcpy(tmp->name,name1);
+		tmp->down = array[i]->up->down;
+		array[i]->up->down = tmp;
+		tmp->up = array[i]->up;
+		array[i]->up = tmp;
 
-		if(ptr = NULL)
+		if(ptr == NULL)
 		{
 		    tmp->right = tmp->left = tmp;
+		    //printf("row is %d\n",j);
 		}
 		else
 		{
@@ -89,7 +116,7 @@ head matrixcvtlinks(int **matrix,int width,int height)
 
 		ptr = tmp;
 
-		(*(array + i)).num++;
+		(array[i]->num)++;
 	    }
 	}
     }
@@ -101,9 +128,8 @@ head matrixcvtlinks(int **matrix,int width,int height)
 head choice_column(head h)
 {
     head ptr = NULL;
+    head tmp = h->right;
     int min = 100000; 
-    int i = 0;
-    int j = 0;
     assert(h);
 
     ptr = h->right;
@@ -113,28 +139,31 @@ head choice_column(head h)
 	if(min > (ptr)->num)	
 	{
 	    min = ptr->num; 
-	    i = j;
+	    tmp = ptr;
 	}
-	
-	j++;
     }
-
-    return (h->right + i);
+    printf("choice column's name:%s\n",tmp->name);
+    return (tmp);
 }
 
 void cover_column(head column)
 {
-    //删除列定点
+    //删除列顶点
     head ptr = column->down;
+    printf("cover column is %s\n",column->name);
 
     column->left->right = column->right;
     column->right->left = column->left;
     
+    //printf("name:%s,num:%d\n",column->right->name,column->right->num);
+
     for(;ptr != column; ptr = ptr->down)
     {
 	head ptr1 = ptr->right;
+	//printf("name :%s\n",ptr->c->name);
 	for(;ptr1 != ptr; ptr1 = ptr1->right)
 	{
+	    //printf("111\n");
 	    ptr1->down->up = ptr1->up;
 	    ptr1->up->down = ptr1->down;
 	    ptr1->c->num--;
@@ -147,7 +176,8 @@ void uncover_column(head column)
     head ptr = column->up;
 
     assert(column);
-    
+    printf("uncover column is %s\n",column->name);
+
     for(; ptr != column; ptr = ptr->up)
     {
 	head ptr1 = ptr->left;
@@ -171,20 +201,22 @@ void search(head h,int k)
 	int i = 0;
 	while(key[i])
 	{
+	    printf("key %d is ",i);
+	    printf("第%s行:",key[i]->name);
 	    head tmp = key[i];
-	    for(;tmp->right != key[i];tmp = tmp->right)
+	    for(;tmp != key[i]->left;tmp = tmp->right)
 		printf("%s ",tmp->c->name);
-
+	    printf("%s ",tmp->c->name); 
 	    i++;
+	    printf("\n");
 	}
-	printf("\n");
     }
     else
     {
 	head next_column = choice_column(h);
 	head ptr = next_column->down;
 	cover_column(next_column);
-
+	
 	for(;ptr != next_column; ptr = ptr->down)
 	{
 	    head ptr1 = ptr->right;
@@ -194,6 +226,8 @@ void search(head h,int k)
 	    {
 		cover_column(ptr1->c);
 	    }
+	       
+	    printf("----------------------------------\n");
 
 	    search(h,k+1);
 
@@ -207,5 +241,69 @@ void search(head h,int k)
 	    key[k] = NULL;
 	}
 	uncover_column(next_column);
+	printf("zuihou is %s\n",next_column->name);
+#if 0	
+	test = h->right;
+	for(;test != h; test = test->right)
+	{
+		printf("addr:%p\n",test);
+	}
+#endif
     }
+}
+
+
+void display(head h,int num)
+{
+    int i = 0;
+    head ptr = array[0]->down;
+    head ptr1 = ptr->right;
+
+    head ptr2 = h->right;
+    for(;ptr2 != h; ptr2 = ptr2->right)
+    {
+	printf("2 head addr is %p\n",ptr2);
+    }
+    for(i = 0; i < num; i++)
+    {
+	printf("head addr %d is %p\n",i,array[i]);
+    }
+
+
+    for(;ptr != array[0]; ptr = ptr->down)
+    {
+	printf("c:%p,ptr:%p,array[0]:%p\n",ptr->c,ptr,array[0]);
+    }
+
+    for(;ptr1 != array[0]->down;ptr1 = ptr1->right)
+    {
+	printf("ptr1 addr is %p\n",ptr1);
+    }
+}
+
+void free_links(head h)
+{
+    head ptr = h->right;
+
+    while(ptr != h) 
+    {
+	head tmp1 = ptr;
+	head tmp2 = ptr->down;
+	ptr = ptr->right;
+	
+	while(tmp2 != tmp1)
+	{
+	    head tmp3 = tmp2;
+	    tmp2 = tmp2->down;
+	    FREE(tmp3);
+	}
+
+	FREE(tmp1);
+    }
+
+    FREE(h);
+    h = NULL;
+
+    FREE(array);
+    array = NULL;
 }

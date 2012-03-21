@@ -3,7 +3,9 @@
 
 typedef struct head* head;
 
-extern head matrixcvtlinks(int **matrix,int width,int height);
+extern head matrixcvtlinks(int (*matrix)[7],int row,int column);
 extern void search(head h,int k);
+extern void display(head h,int num);
+extern void free_links(head h);
 
 #endif
