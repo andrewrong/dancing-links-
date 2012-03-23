@@ -6,11 +6,19 @@
 int main()
 {
     int **matrix = NULL;
-    int row = 41;
-    int column = 21;
+    int row = 0;
+    int column = 0;
     int i = 0;
     int j = 0;
-    head h = NULL;
+    //head h = NULL;
+    mem_in_id = -1;
+    is_check = 1;
+
+    mem_check_init();
+    init(4,5);
+    get_possible(4,4,5,&row,&column);
+
+    printf("row:%d,column:%d\n",row,column);
 
     matrix = MALLOC(sizeof(int *) * row);
     
@@ -25,15 +33,16 @@ int main()
 	    matrix[i][j] = 0;
 	}
 
-    init_shape();
-    init_matrix(matrix,4,4,5,&row,&column);
+    init_matrix(matrix,4,5);
 
-    h = matrixcvtlinks(matrix,row,column);
-    search(h,0);
-    free_links(h);
+    //h = matrixcvtlinks(matrix,row,column);
+    //search(h,0);
+    //free_links(h);
 
     //printf("r:%d,c:%d\n",row,column);
-    //matrix_display(matrix,row,column);
+    matrix_display(matrix,row,column);
 
+    free_matrix(matrix,row,column,4,4,5);
+    mem_check_write();
     return 0;
 }

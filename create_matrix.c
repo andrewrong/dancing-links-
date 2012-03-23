@@ -1,136 +1,136 @@
 #include <stdio.h>
 #include <assert.h>
+#include "create_matrix.h"
 #include "m_mem.h"
+#define BLOCKS 6
 
 struct point
 {
     int row,column;
 };
 
-typedef struct point point;
 
 struct shape
 {
-    point form[6];
+    struct point form[BLOCKS];
     int max_height;
 };
 
 typedef struct shape* shape;
 
-shape myshape[5];
+shape myshape = NULL;
+point *possiblepoint = NULL;
 
-point possible0[4];
-point possible1[4];
-point possible2[4];
-point possible3[4];
-point possible4[4];
-
-void init_point(point *p)
+static void init_possiblepoint(int row,int shapenum)
 {
-    int i = 0;
-    
-    for(i = 0; i < 4; i++)
+    int i = 0; 
+    int j = 0; 
+    assert(row >= 0 && shapenum >= 0);
+
+    possiblepoint = MALLOC(sizeof(point) * shapenum);
+
+    for(i = 0 ; i < shapenum; i++)
     {
-	p[i].row = -1;
-	p[i].column = -1;
+	*(possiblepoint+i) =  MALLOC(sizeof(struct point) * row);
     }
+
+    for(i = 0; i < shapenum; i++)
+    {
+	for(j = 0; j < row; j++)
+	{
+	    possiblepoint[i][j].row = -1;
+	    possiblepoint[i][j].column = -1;
+	}
+    }
+    
 }
 
-void init_shape()
+static void init_shape(int shapenum)
 {
     int i = 0;
-
-    myshape[0] = (shape)MALLOC(sizeof(struct shape));
-    myshape[1] = (shape)MALLOC(sizeof(struct shape));
-    myshape[2] = (shape)MALLOC(sizeof(struct shape));
-    myshape[3] = (shape)MALLOC(sizeof(struct shape));
-    myshape[4] = (shape)MALLOC(sizeof(struct shape));
     
-    assert(myshape[0] && myshape[1] && myshape[2] && myshape[3] && myshape[4]);
+    assert(shapenum >= 0);
 
-    myshape[0]->form[0].row = 0;
-    myshape[0]->form[0].column = 0;
-    myshape[0]->form[1].row = 0;
-    myshape[0]->form[1].column = 0;
-    myshape[0]->form[2].row = 0;
-    myshape[0]->form[2].column = 0;
-    myshape[0]->form[3].row = 1;
-    myshape[0]->form[3].column = 0;
-    myshape[0]->form[4].row = 0;
-    myshape[0]->form[4].column = 0;
-    myshape[0]->form[5].row = 0;
-    myshape[0]->form[5].column = 0;
-    myshape[0]->max_height = 2;
+    myshape = MALLOC(sizeof(struct shape)*shapenum);
+    assert(myshape);
+
+    myshape[0].form[0].row = 0;
+    myshape[0].form[0].column = 0;
+    myshape[0].form[1].row = 0;
+    myshape[0].form[1].column = 0;
+    myshape[0].form[2].row = 0;
+    myshape[0].form[2].column = 0;
+    myshape[0].form[3].row = 1;
+    myshape[0].form[3].column = 0;
+    myshape[0].form[4].row = 0;
+    myshape[0].form[4].column = 0;
+    myshape[0].form[5].row = 0;
+    myshape[0].form[5].column = 0;
+    myshape[0].max_height = 2;
     
-    myshape[1]->form[0].row = 0;
-    myshape[1]->form[0].column = 0;
-    myshape[1]->form[1].row = 0;
-    myshape[1]->form[1].column = 1;
-    myshape[1]->form[2].row = 0;
-    myshape[1]->form[2].column = 2;
-    myshape[1]->form[3].row = 0;
-    myshape[1]->form[3].column = 0;
-    myshape[1]->form[4].row = 0;
-    myshape[1]->form[4].column = 0;
-    myshape[1]->form[5].row = 1;
-    myshape[1]->form[5].column = 2;
-    myshape[1]->max_height = 2;
+    myshape[1].form[0].row = 0;
+    myshape[1].form[0].column = 0;
+    myshape[1].form[1].row = 0;
+    myshape[1].form[1].column = 1;
+    myshape[1].form[2].row = 0;
+    myshape[1].form[2].column = 2;
+    myshape[1].form[3].row = 0;
+    myshape[1].form[3].column = 0;
+    myshape[1].form[4].row = 0;
+    myshape[1].form[4].column = 0;
+    myshape[1].form[5].row = 1;
+    myshape[1].form[5].column = 2;
+    myshape[1].max_height = 2;
 
-    myshape[2]->form[0].row = 0;
-    myshape[2]->form[0].column = 0;
-    myshape[2]->form[1].row = 0;
-    myshape[2]->form[1].column = 1;
-    myshape[2]->form[2].row = 0;
-    myshape[2]->form[2].column = 0;
-    myshape[2]->form[3].row = 0;
-    myshape[2]->form[3].column = 0; myshape[2]->form[4].row = 1;
-    myshape[2]->form[4].column = 1;
-    myshape[2]->form[5].row = 1;
-    myshape[2]->form[5].column = 2;
-    myshape[2]->max_height = 2;
+    myshape[2].form[0].row = 0;
+    myshape[2].form[0].column = 0;
+    myshape[2].form[1].row = 0;
+    myshape[2].form[1].column = 1;
+    myshape[2].form[2].row = 0;
+    myshape[2].form[2].column = 0;
+    myshape[2].form[3].row = 0;
+    myshape[2].form[3].column = 0; 
+    myshape[2].form[4].row = 1;
+    myshape[2].form[4].column = 1;
+    myshape[2].form[5].row = 1;
+    myshape[2].form[5].column = 2;
+    myshape[2].max_height = 2;
 
-    myshape[3]->form[0].row = 0;
-    myshape[3]->form[0].column = 0;
-    myshape[3]->form[1].row = 0;
-    myshape[3]->form[1].column = 1;
-    myshape[3]->form[2].row = 0;
-    myshape[3]->form[2].column = 2;
-    myshape[3]->form[3].row = 0;
-    myshape[3]->form[3].column = 0;
-    myshape[3]->form[4].row = 0;
-    myshape[3]->form[4].column = 0;
-    myshape[3]->form[5].row = 0; 
-    myshape[3]->form[5].column = 0; 
-    myshape[3]->max_height = 1;
+    myshape[3].form[0].row = 0;
+    myshape[3].form[0].column = 0;
+    myshape[3].form[1].row = 0;
+    myshape[3].form[1].column = 1;
+    myshape[3].form[2].row = 0;
+    myshape[3].form[2].column = 2;
+    myshape[3].form[3].row = 0;
+    myshape[3].form[3].column = 0;
+    myshape[3].form[4].row = 0;
+    myshape[3].form[4].column = 0;
+    myshape[3].form[5].row = 0; 
+    myshape[3].form[5].column = 0; 
+    myshape[3].max_height = 1;
 
-    myshape[4]->form[0].row = 0;
-    myshape[4]->form[0].column = 0;
-    myshape[4]->form[1].row = 0;
-    myshape[4]->form[1].column = 1;
-    myshape[4]->form[2].row = 0;
-    myshape[4]->form[2].column = 0;
-    myshape[4]->form[3].row = 1;
-    myshape[4]->form[3].column = 0;
-    myshape[4]->form[4].row = 0;
-    myshape[4]->form[4].column = 0;
-    myshape[4]->form[5].row = 0;
-    myshape[4]->form[5].column = 0;
-    myshape[4]->max_height = 2;
-	
-    init_point(possible0);
-    init_point(possible1);
-    init_point(possible2);
-    init_point(possible3);
-    init_point(possible4);
+    myshape[4].form[0].row = 0;
+    myshape[4].form[0].column = 0;
+    myshape[4].form[1].row = 0;
+    myshape[4].form[1].column = 1;
+    myshape[4].form[2].row = 0;
+    myshape[4].form[2].column = 0;
+    myshape[4].form[3].row = 1;
+    myshape[4].form[3].column = 0;
+    myshape[4].form[4].row = 0;
+    myshape[4].form[4].column = 0;
+    myshape[4].form[5].row = 0;
+    myshape[4].form[5].column = 0;
+    myshape[4].max_height = 2;
 }
 
-
-int judge_border(shape s)
+int judge_border(shape s,int row)
 {
     int i = 0;
     for(i = 0; i < 6; i++)
     {
-	if((s->form[i]).row >= 4 || (s->form[i]).column >= 4)
+	if((s->form[i]).row >= row || (s->form[i]).column >= row)
 	{
 	    return 0;
 	}
@@ -138,293 +138,104 @@ int judge_border(shape s)
     return 1;
 }
 
-void init_matrix(int **matrix,int row,int column,int shapenum,int *realrow,int *realcolumn)
+void init(int row,int shapenum)
+{
+    init_possiblepoint(row,shapenum);
+    init_shape(shapenum);
+}
+
+void get_possible(int row,int column,int shapenum,int *realrow,int *realcolumn)
 {
     int i = 0;
     int j = 0;
-    int k = 0;
     int h = 0;
-    int possible = 0;
+    int k = 0;
     int counter = 0;
 
-    for(i = 0; i < 5; i++)
+    for(i = 0; i < shapenum; i++)
     {
 	counter = 0;
+
 	for(k = 0; k < column; k++)
 	{
-	    shape tmp = myshape[i];
-	    for(h = 0; h < 6; h++)
+	    shape tmp = myshape + i;
+
+	    for(h = 0; h < BLOCKS; h++)
 	    {
 		tmp->form[h].row += j;
 		tmp->form[h].column += k;
 	    }
 		
-	    if(judge_border(tmp))
+	    if(judge_border(tmp,row))
 	    {
-		switch(i)
-		{
-		    case 0:
-			possible0[counter].row = j;
-			possible0[counter].column = k;
-			break;
-		    case 1:
-			possible1[counter].row = j;
-			possible1[counter].column = k;
-			break;
-		    case 2:
-			possible2[counter].row = j;
-			possible2[counter].column = k;
-			break;
-		    case 3:
-			possible3[counter].row = j;
-			possible3[counter].column = k;
-			break;
-		    case 4:
-			possible4[counter].row = j;
-			possible4[counter].column = k;
-			break;
-		}
+		possiblepoint[i][counter].row = j;
+		possiblepoint[i][counter].column = k;
+		//printf("(%d,%d),i:%d,counter:%d\n",j,k,i,counter);
 		counter++;
 	    }
 
-	    for(h = 0; h < 6; h++)
+	    for(h = 0; h < BLOCKS; h++)
 	    {
 		tmp->form[h].row -= j;
 		tmp->form[h].column -= k;
 	    }
 	}
-	//printf("shape[%d] possible is %d\n",i,counter);
-	possible += counter * (row - myshape[i]->max_height + 1);
+
+	(*realrow) += (row - myshape[i].max_height + 1) * counter;
     }
-    
-    //printf("possible is %d\n",possible);
-    counter = 0;
-    
-    *realrow = possible;
-    *realcolumn = row*column+shapenum;
+    (*realcolumn) = row * column + shapenum;
+}
+
+void init_matrix(int **matrix,int row,int shapenum)
+{
+    int i = 0;
+    int j = 0;
+    int h = 0;
+    int k = 0;
+    int counter = 0;
 
     for(i = 0; i < shapenum; i++)
     {
-	switch(i)
+	k = 0;
+	struct point tmp = possiblepoint[i][k++];
+	while(tmp.row != -1 && tmp.column != -1)
 	{
-	    case 0:
-		{
-		    k = 0;
-		    point tmp = possible0[k++]; 
-		    while(tmp.row != -1 && tmp.column != -1)
-		    {
-			shape tmp1 = myshape[0];
+	    shape tmp1 = (myshape + i);
 			
-			//printf("shape[0]'s tmp row:%d,tmp column:%d\n",tmp.row,tmp.column);
-			for(j = 0; j < 6; j++)
-			{
-			    if(j == 0) 
-			    {
-				int ii = 0;
-
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][0] = 1;
-				    matrix[counter + ii][(tmp.row + ii) * row + tmp.column + shapenum] = 1;
-				}
-			    }
-			    else if((tmp1->form[j].row + tmp1->form[j].column) != 0)
-			    {
-				int ii = 0;
-
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][(tmp1->form[j].row + tmp.row + ii) * row + (tmp1->form[j].column + tmp.column) + shapenum] = 1;
-				}
-			    }
-			}
-			counter += (row - tmp1->max_height + 1);
-			if(k < 4)
-			{
-			    tmp = possible0[k];
-			    k++;
-			}
-			else
-			{
-			    break;
-			}
-		    }
-		    break;
-		}
-	    case 1:
+	    //printf("shape[%d]'s tmp row:%d,tmp column:%d\n",i,tmp.row,tmp.column);
+	    for(j = 0; j < BLOCKS; j++)
+	    {
+		if(j == 0) 
 		{
-		    k = 0;
-		    point tmp = possible1[k++]; 
-		    while(tmp.row != -1 && tmp.column != -1)
-		    {
-			shape tmp1 = myshape[1];
+			int ii = 0;
 
-			for(j = 0; j < 6; j++)
+			for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
 			{
-			    if(j == 0) 
-			    {
-				int ii = 0;
-
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][1] = 1;
-				    matrix[counter + ii][(tmp.row + ii) * row + tmp.column + shapenum] = 1;
-				}
-			    }
-			    else if(tmp1->form[j].row + tmp1->form[j].column != 0)
-			    {
-				int ii = 0;
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][(tmp1->form[j].row + tmp.row + ii) * row + (tmp1->form[j].column + tmp.column) + shapenum] = 1;
-				}
-			    }
+			    matrix[counter + ii][0] = 1;
+			    matrix[counter + ii][(tmp.row + ii) * row + tmp.column + shapenum] = 1;
 			}
-			counter += (row - tmp1->max_height + 1);
-
-			if(k < 4)
-			{
-			    tmp = possible1[k];
-			    k++;
-			}
-			else
-			{
-			    break;
-			}
-		    }
-		    break;
 		}
-		case 2:
+		else if((tmp1->form[j].row + tmp1->form[j].column) != 0)
 		{
-		    k = 0;
-		    point tmp = possible2[k++]; 
-		    while(tmp.row != -1 && tmp.column != -1)
-		    {
-			shape tmp1 = myshape[2];
+			int ii = 0;
 
-			for(j = 0; j < 6; j++)
+			for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
 			{
-			    if(j == 0) 
-			    {
-				int ii = 0;
-
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][2] = 1;
-				    matrix[counter + ii][(tmp.row + ii) * row + tmp.column + shapenum] = 1;
-				}
-			    }
-			    else if(tmp1->form[j].row + tmp1->form[j].column != 0)
-			    {
-				int ii = 0;
-
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][(tmp1->form[j].row + tmp.row + ii) * row + (tmp1->form[j].column + tmp.column) + shapenum] = 1;
-				}
-			    }
+			    matrix[counter + ii][(tmp1->form[j].row + tmp.row + ii) * row + (tmp1->form[j].column + tmp.column) + shapenum] = 1;
 			}
-			counter += (row - tmp1->max_height + 1);
-			if(k < 4)
-			{
-			    tmp = possible2[k];
-			    k++;
-			}
-			else
-			{
-			    break;
-			}
-		    }
-		    break;
 		}
-	    case 3:
-		{
-		    k = 0;
-		    point tmp = possible3[k++]; 
-		    while(tmp.row != -1 && tmp.column != -1)
-		    {
-			shape tmp1 = myshape[3];
+	    }
+	    counter += (row - tmp1->max_height + 1);
 
-			for(j = 0; j < 6; j++)
-			{
-			    if(j == 0) 
-			    {
-				int ii = 0;
-
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][3] = 1;
-				    matrix[counter + ii][(tmp.row + ii) * row + tmp.column + shapenum] = 1;
-				}
-			    }
-			    else if(tmp1->form[j].row + tmp1->form[j].column != 0)
-			    {
-				int ii = 0;
-
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][((tmp1->form[j]).row + tmp.row + ii) * row + (tmp1->form[j].column + tmp.column) + shapenum] = 1;
-				}
-			    }
-			}
-			counter += (row - tmp1->max_height + 1);
-			
-			//printf("1\n");
-			if(k < 4)
-			{
-			    tmp = possible3[k];
-			    k++;
-			}
-			else
-			{
-			    break;
-			}
-		    }
-		    break;
-		}
-	    case 4:
-		{
-		    k = 0;
-		    point tmp = possible4[k++]; 
-		    while(tmp.row != -1 && tmp.column != -1)
-		    {
-			shape tmp1 = myshape[4];
-
-			for(j = 0; j < 6; j++)
-			{
-			    if(j == 0) 
-			    {
-				int ii = 0;
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][4] = 1;
-				    matrix[counter + ii][(tmp.row + ii) * row + tmp.column + shapenum] = 1;
-				}
-			    }
-			    else if(tmp1->form[j].row + tmp1->form[j].column != 0)
-			    {
-				int ii = 0;
-
-				for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
-				{
-				    matrix[counter + ii][(tmp1->form[j].row + tmp.row + ii) * row + (tmp1->form[j].column + tmp.column) + shapenum] = 1;
-				}
-			    }
-			}
-			counter += (row - tmp1->max_height + 1);
-
-			if(k < 4)
-			{
-			    tmp = possible4[k];
-			    k++;
-			}
-			else
-			{
-			    break;
-			}
-		    }
-		    break;
-		}
+	    if(k < row)
+	    {
+		tmp = possiblepoint[i][k];
+		k++;
+	    }
+	    else
+	    {
+		break;
+	    }
 	}
     }
 }
@@ -442,4 +253,20 @@ void matrix_display(int **matrix,int row,int column)
 	}
 	printf("\n");
     }
+}
+
+void free_matrix(int **matrix,int realrow,int realcolumn,int row,int column,int shapenum)
+{
+    int i = 0; 
+
+    for(i = 0; i < shapenum; i++)
+    {
+	FREE(possiblepoint[i]);
+    }
+    FREE(possiblepoint);
+    FREE(myshape);
+
+    for(i = 0; i < realrow; i++)
+	FREE(matrix[i]);
+    FREE(matrix);
 }
