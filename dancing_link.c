@@ -8,7 +8,7 @@
 struct head
 {
     struct head *right,*left,*down,*up,*c;
-    char name[10];
+    int name; 
     int num;
 };
 
@@ -51,8 +51,8 @@ head matrixcvtlinks(int **matrix,int row,int column)
     int i = 0;
     int j = 0;
 
-    char str[10];
-    char *strname = str;
+    //char str[10];
+    //char *strname = str;
 
     head h = (head)MALLOC(sizeof(struct head));
     array = (head*)MALLOC(sizeof(head) * column);
@@ -66,7 +66,7 @@ head matrixcvtlinks(int **matrix,int row,int column)
    
     for(i = 0; i < column; i++)
     {
-	strname = str;
+	//strname = str;
 	head tmp1 = (head)MALLOC(sizeof(struct head));
 	assert(tmp1);
 
@@ -75,8 +75,8 @@ head matrixcvtlinks(int **matrix,int row,int column)
 	tmp1->left = h->left;
 	h->left = tmp1;
 	tmp1->down = tmp1->up = tmp1;
-	strname = m_itoa(i,strname,10);
-	strcpy(tmp1->name,strname);
+	//strname = m_itoa(i,strname,10);
+	tmp1->name = i;
 	tmp1->num = 0;
 	tmp1->c = tmp1;
 	array[i] = tmp1;
@@ -91,11 +91,11 @@ head matrixcvtlinks(int **matrix,int row,int column)
 	    {
 		head tmp = (head)MALLOC(sizeof(struct head));
 		assert(tmp);
-		strname = str;
-		strname = m_itoa(j,strname,10);
+		//strname = str;
+		//strname = m_itoa(j,strname,10);
 		
 		tmp->c = array[i];
-		strcpy(tmp->name,strname);
+		tmp->name = j;
 		tmp->down = array[i]->up->down;
 		array[i]->up->down = tmp;
 		tmp->up = array[i]->up;
@@ -141,7 +141,7 @@ head choice_column(head h)
 	    tmp = ptr;
 	}
     }
-    printf("choice name:%s\n",tmp->name);
+    printf("choice name:%d\n",tmp->name);
     return (tmp);
 }
 
@@ -149,7 +149,7 @@ void cover_column(head column)
 {
     //删除列顶点
     head ptr = column->down;
-    printf("cover column is %s\n",column->name);
+    printf("cover column is %d\n",column->name);
 
     column->left->right = column->right;
     column->right->left = column->left;
@@ -174,7 +174,7 @@ void uncover_column(head column)
     head ptr = column->up;
 
     assert(column);
-    printf("uncover column is %s\n",column->name);
+    printf("uncover column is %d\n",column->name);
 
     for(; ptr != column; ptr = ptr->up)
     {
@@ -201,14 +201,15 @@ void search(head h,int k)
 	{
 	    head tmp = key[i];
 	    printf("key %d is : ",i);
-	    printf("第%s行的:",tmp->name);
+	    printf("第%d行的:",tmp->name);
 	    for(;tmp->right != key[i];tmp = tmp->right)
-		printf("%s ",tmp->c->name);
-	    printf("%s ",tmp->c->name); 
+		printf("%d ",tmp->c->name);
+	    printf("%d ",tmp->c->name); 
 	    i++;
 
 	    printf("\n");
 	}
+	display_key(4,4,5);
     }
     else
     {
@@ -218,7 +219,7 @@ void search(head h,int k)
 	
 	for(;ptr != next_column; ptr = ptr->down)
 	{
-	    printf("现在正在处理第%s行.\n",ptr->name);
+	    printf("现在正在处理第%d行.\n",ptr->name);
 	    head ptr1 = ptr->right;
 	    key[k] = ptr;
 
@@ -304,4 +305,60 @@ void free_links(head h)
     h = NULL;
 
     FREE(array);
+}
+
+void display_key(int row,int column,int shapenum)
+{
+    int **matrix = NULL;
+    int i = 0;
+    int j = 0;
+    matrix = MALLOC(sizeof(int*) * row);
+
+    for(i = 0;i < row; i++)
+    {
+	matrix[i] = MALLOC(sizeof(int) * column);	
+    }
+
+    for(i = 0; i < row; i++)
+	for(j = 0; j < column; j++)
+	{
+	    matrix[i][j] = 0;
+	}
+
+    i = 0;
+    while(key[i])
+	{
+	   head tmp = key[i]; 
+	   for(;tmp->right != key[i];tmp = tmp->right)
+	   {
+	       //printf("name:%d\n",tmp->c->name);
+		if(tmp->c->name >= shapenum)	
+		{
+		    int tmprow = (tmp->c->name - shapenum) / row;
+		    int tmpcolumn = (tmp->c->name - shapenum) % row;
+		    matrix[tmprow][tmpcolumn] = i;
+		}
+	   }
+
+	   if(tmp->c->name >= shapenum)	
+	    {
+		    int tmprow = (tmp->c->name - shapenum) / row;
+		    int tmpcolumn = (tmp->c->name - shapenum) % row;
+		    matrix[tmprow][tmpcolumn] = i;
+	    }
+	   i++;
+	}
+
+    for(i = 0; i < row; i++)
+    {
+	for(j = 0; j < column; j++)
+	{
+	    printf("%d ",matrix[i][j]);
+	}
+	printf("\n");
+    }
+
+    for(i = 0; i < row; i++)
+	FREE(matrix[i]);
+    FREE(matrix);
 }

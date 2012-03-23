@@ -211,7 +211,7 @@ void init_matrix(int **matrix,int row,int shapenum)
 
 			for(ii = 0; ii < (row - tmp1->max_height + 1); ii++)
 			{
-			    matrix[counter + ii][0] = 1;
+			    matrix[counter + ii][i] = 1;
 			    matrix[counter + ii][(tmp.row + ii) * row + tmp.column + shapenum] = 1;
 			}
 		}

@@ -10,7 +10,7 @@ int main()
     int column = 0;
     int i = 0;
     int j = 0;
-    //head h = NULL;
+    head h = NULL;
     mem_in_id = -1;
     is_check = 1;
 
@@ -35,14 +35,15 @@ int main()
 
     init_matrix(matrix,4,5);
 
-    //h = matrixcvtlinks(matrix,row,column);
-    //search(h,0);
-    //free_links(h);
-
+    h = matrixcvtlinks(matrix,row,column);
+    search(h,0);
+    //display_key(4,4,5);
     //printf("r:%d,c:%d\n",row,column);
-    matrix_display(matrix,row,column);
+    //matrix_display(matrix,row,column);
 
+
+    free_links(h);
     free_matrix(matrix,row,column,4,4,5);
-    mem_check_write();
+    //mem_check_write();
     return 0;
 }
