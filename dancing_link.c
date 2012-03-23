@@ -46,12 +46,12 @@ char *m_itoa(int i,char *ch,int num)
  * 2.链表和数组的地址问题犯错了,以为链表的下一个和数组的下一个是一样的
  * 3.if判断的时候用=替代了==这个错误很初级*/
 
-head matrixcvtlinks(int (*matrix)[7],int row,int column)
+head matrixcvtlinks(int **matrix,int row,int column)
 {
     int i = 0;
     int j = 0;
 
-    char str[256];
+    char str[10];
     char *strname = str;
 
     head h = (head)MALLOC(sizeof(struct head));
@@ -66,6 +66,7 @@ head matrixcvtlinks(int (*matrix)[7],int row,int column)
    
     for(i = 0; i < column; i++)
     {
+	strname = str;
 	head tmp1 = (head)MALLOC(sizeof(struct head));
 	assert(tmp1);
 
@@ -74,7 +75,7 @@ head matrixcvtlinks(int (*matrix)[7],int row,int column)
 	tmp1->left = h->left;
 	h->left = tmp1;
 	tmp1->down = tmp1->up = tmp1;
-	strname = m_itoa(i,strname,256);
+	strname = m_itoa(i,strname,10);
 	strcpy(tmp1->name,strname);
 	tmp1->num = 0;
 	tmp1->c = tmp1;
@@ -89,13 +90,12 @@ head matrixcvtlinks(int (*matrix)[7],int row,int column)
 	    if(matrix[j][i])
 	    {
 		head tmp = (head)MALLOC(sizeof(struct head));
-		char name[10];
-		char *name1 = name;
 		assert(tmp);
+		strname = str;
+		strname = m_itoa(j,strname,10);
 		
-		name1 = m_itoa(j,name1,10);
 		tmp->c = array[i];
-		strcpy(tmp->name,name1);
+		strcpy(tmp->name,strname);
 		tmp->down = array[i]->up->down;
 		array[i]->up->down = tmp;
 		tmp->up = array[i]->up;
@@ -104,7 +104,6 @@ head matrixcvtlinks(int (*matrix)[7],int row,int column)
 		if(ptr == NULL)
 		{
 		    tmp->right = tmp->left = tmp;
-		    //printf("row is %d\n",j);
 		}
 		else
 		{
@@ -142,7 +141,7 @@ head choice_column(head h)
 	    tmp = ptr;
 	}
     }
-    printf("choice column's name:%s\n",tmp->name);
+    printf("choice name:%s\n",tmp->name);
     return (tmp);
 }
 
@@ -160,10 +159,9 @@ void cover_column(head column)
     for(;ptr != column; ptr = ptr->down)
     {
 	head ptr1 = ptr->right;
-	//printf("name :%s\n",ptr->c->name);
+
 	for(;ptr1 != ptr; ptr1 = ptr1->right)
 	{
-	    //printf("111\n");
 	    ptr1->down->up = ptr1->up;
 	    ptr1->up->down = ptr1->down;
 	    ptr1->c->num--;
@@ -201,13 +199,14 @@ void search(head h,int k)
 	int i = 0;
 	while(key[i])
 	{
-	    printf("key %d is ",i);
-	    printf("第%s行:",key[i]->name);
 	    head tmp = key[i];
-	    for(;tmp != key[i]->left;tmp = tmp->right)
+	    printf("key %d is : ",i);
+	    printf("第%s行的:",tmp->name);
+	    for(;tmp->right != key[i];tmp = tmp->right)
 		printf("%s ",tmp->c->name);
 	    printf("%s ",tmp->c->name); 
 	    i++;
+
 	    printf("\n");
 	}
     }
@@ -219,6 +218,7 @@ void search(head h,int k)
 	
 	for(;ptr != next_column; ptr = ptr->down)
 	{
+	    printf("现在正在处理第%s行.\n",ptr->name);
 	    head ptr1 = ptr->right;
 	    key[k] = ptr;
 
@@ -226,8 +226,8 @@ void search(head h,int k)
 	    {
 		cover_column(ptr1->c);
 	    }
-	       
-	    printf("----------------------------------\n");
+
+	    printf("---------------------------------\n");
 
 	    search(h,k+1);
 
@@ -241,7 +241,6 @@ void search(head h,int k)
 	    key[k] = NULL;
 	}
 	uncover_column(next_column);
-	printf("zuihou is %s\n",next_column->name);
 #if 0	
 	test = h->right;
 	for(;test != h; test = test->right)
@@ -305,5 +304,4 @@ void free_links(head h)
     h = NULL;
 
     FREE(array);
-    array = NULL;
 }

@@ -1,4 +1,4 @@
-SRC_FILE=./main.c ./mem/m_mem.c ./dancing_link.c
+SRC_FILE=./main1.c ./mem/m_mem.c ./dancing_link.c ./create_matrix.c
 HEAD_FILE=-I./mem/
 OBJ_FILE=${patsubst %.c,%.o,${SRC_FILE}}
 
